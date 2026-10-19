@@ -130,6 +130,17 @@ if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
                         >
                     </div>
 
+                    <div class="form-field">
+                        <label for="register-password-confirmation">Repite la contraseña</label>
+                        <input
+                            type="password"
+                            id="register-password-confirmation"
+                            name="confirmar_password"
+                            autocomplete="new-password"
+                            required
+                        >
+                    </div>
+
                     <button type="submit">Crear cuenta</button>
                 </form>
             </section>
@@ -139,6 +150,6 @@ if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
     <footer class="site-footer">
         <p>ChatOnline · Mensajes para estar más cerca</p>
     </footer>
-    <!-- // rev-ae01-alfie -->
+    
 </body>
 </html>
