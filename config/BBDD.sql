@@ -20,7 +20,7 @@ CREATE TABLE tbl_messages (
   id_message INT AUTO_INCREMENT PRIMARY KEY,
   id_sender INT NOT NULL,
   id_receiver INT NOT NULL,
-  content TEXT NOT NULL,
+  content varchar(250) NOT NULL,
   sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (id_sender)   REFERENCES tbl_users(id_users) ON DELETE CASCADE,
   FOREIGN KEY (id_receiver) REFERENCES tbl_users(id_users) ON DELETE CASCADE
