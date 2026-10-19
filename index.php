@@ -1,9 +1,13 @@
 <?php
-// Inicia o recupera la sesión para poder consultar sus datos.
+// Inicia o recupera la sesion. Debe ocurrir antes de enviar HTML al navegador.
 session_start();
 
-// Si ya hay un username guardado en la sesión, estará disponible para mostrarlo.
+// Si el login fue correcto, el procesador guarda username en la sesion.
 $username = '';
+// El registro redirige con registered=1 para mostrar un aviso de exito.
+$registered = isset($_GET['registered']) && $_GET['registered'] === '1';
+// El login redirige con error=login si las credenciales no son correctas.
+$loginError = isset($_GET['error']) && $_GET['error'] === 'login';
 
 if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
     $username = $_SESSION['username'];
@@ -28,6 +32,7 @@ if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
         <!-- Solo se muestra el usuario y el enlace de salida si hay sesión iniciada. -->
         <?php if ($username !== '') { ?>
             <div class="session-info">
+                <!-- htmlspecialchars evita interpretar el username como codigo HTML. -->
                 <span>Sesión iniciada como <strong><?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?></strong></span>
                 <a href="logout.php">Cerrar sesión</a>
             </div>
@@ -48,11 +53,17 @@ if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
                 </div>
                 <p class="card-description">¿Ya tienes cuenta? Inicia sesión con tu username.</p>
 
-                <!-- POST envía las credenciales al archivo que procesará el login. -->
-                <form action="processes/login.php" method="post">
+                <?php if ($registered) { ?>
+                    <p class="form-message" role="status">Tu cuenta se ha creado. Ya puedes iniciar sesión.</p>
+                <?php } elseif ($loginError) { ?>
+                    <p class="form-message" role="alert">Username o contraseña incorrectos.</p>
+                <?php } ?>
+
+                <!-- POST envia username y password a login.proc.php, que los compara con la BBDD. -->
+                <form action="processes/login.proc.php" method="post">
                     <div class="form-field">
                         <label for="login-username">Username</label>
-                        <!-- name identifica este dato al recibir el formulario en PHP. -->
+                        <!-- name define la clave que login.proc.php buscara en $_POST. -->
                         <input
                             type="text"
                             id="login-username"
@@ -65,6 +76,7 @@ if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
 
                     <div class="form-field">
                         <label for="login-password">Contraseña</label>
+                        <!-- El navegador oculta visualmente el valor; no sustituye el hash en PHP. -->
                         <input
                             type="password"
                             id="login-password"

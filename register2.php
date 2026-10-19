@@ -1,16 +1,23 @@
 <?php
-// Inicia la sesión antes de generar HTML; podrá utilizarse para guardar el usuario tras registrarse.
+// Inicia la sesion antes de mostrar HTML. PHP la puede continuar en otras paginas.
 session_start();
+
+// El procesador vuelve a esta pagina con ?error=... cuando algun dato no es valido.
+// El operador ?? usa una cadena vacia si la variable error no viene en la URL.
+$error = $_GET['error'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Hace que el diseño se adapte al ancho del dispositivo. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatOnline | Crear cuenta</title>
+    <!-- El valor v=2 permite al navegador distinguir esta version del CSS en su cache. -->
     <link rel="stylesheet" href="css/styles.css?v=2">
 </head>
 <body>
+    <!-- Cabecera con un enlace para volver al inicio de sesion. -->
     <header class="site-header">
         <a class="brand" href="index.php" aria-label="Chat Online, inicio">
             <span class="brand-icon" aria-hidden="true">C</span>
@@ -18,6 +25,7 @@ session_start();
         </a>
     </header>
 
+    <!-- Contenido principal de la pagina de registro. -->
     <main class="page-content">
         <section class="intro">
             <p class="eyebrow">Únete a ChatOnline</p>
@@ -32,11 +40,18 @@ session_start();
                 </div>
                 <p class="card-description">Introduce tus datos para crear una cuenta.</p>
 
-                <!-- POST envía los datos al archivo que procesará y validará el registro. -->
-                <form action="processes/register.php" method="post">
+                <!-- Estos mensajes dependen del codigo de error enviado por register.proc.php. -->
+                <?php if ($error === 'invalid') { ?>
+                    <p class="form-message" role="alert">Revisa los datos: comprueba el formato del email, que las contraseñas coincidan y que la contraseña tenga entre 8 y 72 caracteres.</p>
+                <?php } elseif ($error === 'exists') { ?>
+                    <p class="form-message" role="alert">Ese username o correo ya está registrado.</p>
+                <?php } ?>
+
+                <!-- POST envia los campos en el cuerpo de la peticion a register.proc.php. -->
+                <form action="processes/register.proc.php" method="post">
                     <div class="form-field">
                         <label for="register-real-name">Nombre real</label>
-                        <!-- nombre_real es la clave que recibirá el código PHP del registro. -->
+                        <!-- El atributo name sera la clave usada para leer el valor desde $_POST. -->
                         <input
                             type="text"
                             id="register-real-name"
@@ -49,7 +64,7 @@ session_start();
 
                     <div class="form-field">
                         <label for="register-username">Username</label>
-                        <!-- pattern limita el username a letras, números y guion bajo en el navegador. -->
+                        <!-- pattern valida en el navegador; register.proc.php tambien lo valida en el servidor. -->
                         <input
                             type="text"
                             id="register-username"
@@ -62,6 +77,7 @@ session_start();
                         >
                     </div>
 
+                    <!-- El tipo email comprueba el formato basico antes de enviar el formulario. -->
                     <div class="form-field">
                         <label for="register-email">Correo electrónico</label>
                         <input
@@ -74,6 +90,7 @@ session_start();
                         >
                     </div>
 
+                    <!-- type=password oculta lo escrito en pantalla, pero no cifra el dato enviado. -->
                     <div class="form-field">
                         <label for="register-password">Contraseña</label>
                         <input
@@ -85,6 +102,7 @@ session_start();
                         >
                     </div>
 
+                    <!-- Esta segunda entrada permite comparar ambas contrasenas en PHP. -->
                     <div class="form-field">
                         <label for="register-password-confirmation">Repite la contraseña</label>
                         <input
