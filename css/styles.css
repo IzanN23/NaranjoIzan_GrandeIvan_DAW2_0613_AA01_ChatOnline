@@ -73,13 +73,20 @@ body {
 }
 
 .page-content {
-    width: min(1000px, calc(100% - 48px));
+    /* El contenido ocupa el espacio entre cabecera y pie y se centra en ambos ejes. */
+    width: calc(100% - 48px);
+    max-width: none;
     margin: 0 auto;
-    padding: 65px 0 72px;
+    padding: 36px 0;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .intro {
+    width: min(100%, 610px);
     max-width: 610px;
     margin: 0 auto 36px;
     text-align: center;
@@ -109,13 +116,17 @@ h1 {
 }
 
 .forms {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
-    gap: 22px;
+    /* La tarjeta queda centrada horizontalmente dentro de todo el contenido. */
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 .form-card {
+    /* La tarjeta no supera 480px, pero se adapta a pantallas estrechas. */
+    width: min(100%, 480px);
+    margin-right: auto;
+    margin-left: auto;
     padding: 29px;
     border: 1px solid #e0e9e3;
     border-radius: 18px;
@@ -151,6 +162,23 @@ h2 {
     color: #68776f;
     font-size: 0.92rem;
     line-height: 1.5;
+}
+
+.form-switch {
+    margin: 22px 0 0;
+    color: #68776f;
+    font-size: 0.92rem;
+    text-align: center;
+}
+
+.form-switch a {
+    color: #08784f;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.form-switch a:hover {
+    text-decoration: underline;
 }
 
 .form-field {
@@ -222,12 +250,8 @@ a:focus-visible {
 }
 
 @media (max-width: 720px) {
-    .forms {
-        grid-template-columns: 1fr;
-    }
-
     .page-content {
-        padding-top: 46px;
+        padding: 32px 0;
     }
 }
 
