@@ -1,7 +1,12 @@
+CREATE DATABASE db_watsap;
+USE db_watsap;
+
 CREATE TABLE tbl_users (
   id_users INT AUTO_INCREMENT PRIMARY KEY,
   name_users VARCHAR(100) NOT NULL,
-  username_users VARCHAR(50) NOT NULL UNIQUE
+  username_users VARCHAR(50) NOT NULL UNIQUE,
+  email_users VARCHAR(100) NOT NULL UNIQUE,
+  password_users VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE tbl_friend_request (

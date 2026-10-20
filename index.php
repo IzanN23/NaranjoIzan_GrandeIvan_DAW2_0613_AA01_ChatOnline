@@ -12,6 +12,12 @@ $loginError = isset($_GET['error']) && $_GET['error'] === 'login';
 if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
     $username = $_SESSION['username'];
 }
+
+// Si ya inicio sesion, no necesita volver a ver el formulario de login.
+if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id'])) {
+    header('Location: chat.php');
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -88,7 +94,7 @@ if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
 
                     <button type="submit">Entrar</button>
                 </form>
-                <p class="form-switch">¿No tienes cuenta? <a href="register2.php">Regístrate aquí</a>.</p>
+                <p class="form-switch">¿No tienes cuenta? <a href="register.php">Regístrate aquí</a>.</p>
             </section>
         </div>
     </main>
@@ -96,6 +102,6 @@ if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
     <footer class="site-footer">
         <p>ChatOnline · Mensajes para estar más cerca</p>
     </footer>
-    
+    <!-- // rev-ae01-alfie -->
 </body>
 </html>
