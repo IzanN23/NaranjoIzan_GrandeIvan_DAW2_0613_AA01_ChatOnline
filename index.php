@@ -88,7 +88,7 @@ if (isset($_SESSION['username']) && is_string($_SESSION['username'])) {
 
                     <button type="submit">Entrar</button>
                 </form>
-                <p class="form-switch">¿No tienes cuenta? <a href="register2.php">Regístrate aquí</a>.</p>
+                <p class="form-switch">¿No tienes cuenta? <a href="register.php">Regístrate aquí</a>.</p>
             </section>
         </div>
     </main>

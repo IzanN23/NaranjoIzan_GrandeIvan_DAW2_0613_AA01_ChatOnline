@@ -5,7 +5,7 @@ session_start();
 // El procesador solo acepta datos enviados por un formulario POST.
 // Si alguien abre esta URL directamente, vuelve al formulario de registro.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../register2.php');
+    header('Location: ../register.php');
     exit;
 }
 
@@ -25,7 +25,7 @@ if (
     !is_string($passwordConfirmation)
 ) {
     // Los valores de $_POST normalmente son texto; se rechazan si alguien envia otro tipo.
-    header('Location: ../register2.php?error=invalid');
+    header('Location: ../register.php?error=invalid');
     exit;
 }
 
@@ -51,7 +51,7 @@ if (
     $password !== $passwordConfirmation
 ) {
     // Se envia un codigo simple por GET para que register2.php muestre el mensaje.
-    header('Location: ../register2.php?error=invalid');
+    header('Location: ../register.php?error=invalid');
     exit;
 }
 
@@ -76,7 +76,7 @@ try {
 } catch (PDOException $e) {
     // SQLSTATE 23000 indica una restriccion incumplida, por ejemplo username/email duplicado.
     if ($e->getCode() === '23000') {
-        header('Location: ../register2.php?error=exists');
+        header('Location: ../register.php?error=exists');
         exit;
     }
 
