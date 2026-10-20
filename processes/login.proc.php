@@ -27,7 +27,7 @@ if (
 $username = trim($username);
 
 // Incluye el archivo que crea la conexion PDO llamada $conn.
-require_once __DIR__ . '/../services/connection.php';
+require_once '../services/connection.php';
 
 // Busca solo el registro que coincide con el username.
 // La consulta preparada evita insertar el valor directamente dentro del SQL.
@@ -53,6 +53,6 @@ session_regenerate_id(true);
 $_SESSION['user_id'] = $user['id_users'];
 $_SESSION['username'] = $user['username_users'];
 
-// Vuelve al inicio; index.php ya puede reconocer al usuario conectado.
-header('Location: ../index.php');
+// Al entrar correctamente, lleva al usuario a la pagina protegida del chat.
+header('Location: ../chat.php');
 exit;

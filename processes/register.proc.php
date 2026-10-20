@@ -55,7 +55,7 @@ if (
     exit;
 }
 
-require_once __DIR__ . '/../services/connection.php';
+require_once '../services/connection.php';
 
 // Crea un hash BCRYPT de la contrasena. El hash es lo unico que se guarda en la BBDD.
 $passwordHash = password_hash($password, PASSWORD_BCRYPT);
