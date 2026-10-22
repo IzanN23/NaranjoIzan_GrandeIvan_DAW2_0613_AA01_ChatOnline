@@ -102,6 +102,6 @@ if (isset($_SESSION['user_id']) && is_numeric($_SESSION['user_id'])) {
     <footer class="site-footer">
         <p>ChatOnline · Mensajes para estar más cerca</p>
     </footer>
-    <!-- // rev-ae01-alfie -->
+   
 </body>
 </html>

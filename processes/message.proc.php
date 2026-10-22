@@ -34,7 +34,11 @@ if ($content === '' || mb_strlen($content, 'UTF-8') > 250) {
 require_once '../services/connection.php';
 
 // Comprueba en la base de datos que la persona destinataria sea una amistad aceptada.
-$sqlFriend = 'SELECT id_request FROM tbl_friend_request WHERE status = :status AND ( (id_sender = :sender_one AND id_receiver = :receiver_one) OR (id_sender = :sender_two AND id_receiver = :receiver_two))LIMIT 1';
+$sqlFriend = 'SELECT id_request 
+            FROM tbl_friend_request 
+            WHERE status = :status AND ( (id_sender = :sender_one AND id_receiver = :receiver_one) 
+            OR (id_sender = :sender_two AND id_receiver = :receiver_two))
+            LIMIT 1';
 
 
 $friendStatement = $conn->prepare($sqlFriend);
