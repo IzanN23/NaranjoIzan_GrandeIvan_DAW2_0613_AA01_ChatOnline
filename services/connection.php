@@ -1,6 +1,6 @@
 <?php
 // Importa host, nombre de base de datos y credenciales desde config.php.
-require_once  '/config.php';
+require_once  'config.php';
 
  try { 
      // Se crea una instancia de la clase PDO para establecer la conexión 
