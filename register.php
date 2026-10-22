@@ -49,7 +49,7 @@ $error = $_GET['error'] ?? '';
 
                 <!-- POST envia los campos en el cuerpo de la peticion a register.proc.php. -->
                 <form action="processes/register.proc.php" method="post">
-                    <div class="form-field">
+                    <div class="form-field" id="nombre">
                         <label for="register-real-name">Nombre real</label>
                         <!-- El atributo name sera la clave usada para leer el valor desde $_POST. -->
                         <input
@@ -62,7 +62,7 @@ $error = $_GET['error'] ?? '';
                         >
                     </div>
 
-                    <div class="form-field">
+                    <div class="form-field" id="username">
                         <label for="register-username">Username</label>
                         <!-- pattern valida en el navegador; register.proc.php tambien lo valida en el servidor. -->
                         <input
@@ -78,7 +78,7 @@ $error = $_GET['error'] ?? '';
                     </div>
 
                     <!-- El tipo email comprueba el formato basico antes de enviar el formulario. -->
-                    <div class="form-field">
+                    <div class="form-field" id="email">
                         <label for="register-email">Correo electrónico</label>
                         <input
                             type="email"
@@ -91,7 +91,7 @@ $error = $_GET['error'] ?? '';
                     </div>
 
                     <!-- type=password oculta lo escrito en pantalla, pero no cifra el dato enviado. -->
-                    <div class="form-field">
+                    <div class="form-field" id="pwd">
                         <label for="register-password">Contraseña</label>
                         <input
                             type="password"
@@ -103,7 +103,7 @@ $error = $_GET['error'] ?? '';
                     </div>
 
                     <!-- Esta segunda entrada permite comparar ambas contrasenas en PHP. -->
-                    <div class="form-field">
+                    <div class="form-field" id="pwdconf">
                         <label for="register-password-confirmation">Repite la contraseña</label>
                         <input
                             type="password"
