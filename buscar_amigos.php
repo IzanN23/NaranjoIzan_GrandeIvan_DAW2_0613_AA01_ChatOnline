@@ -24,7 +24,7 @@
     </header>
 
     <!-- menu sidebar donde aparezcan las solicitudes de amistad -->
-
+    
 
 
     <!-- un div donde este el buscador de personas de la base de datos -->

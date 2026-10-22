@@ -48,7 +48,7 @@ $error = $_GET['error'] ?? '';
                 <?php } ?>
 
                 <!-- POST envia los campos en el cuerpo de la peticion a register.proc.php. -->
-                <form action="processes/register.proc.php" method="post">
+                <form id="form_register" action="processes/register.proc.php" method="post">
                     <div class="form-field" id="nombre">
                         <label for="register-real-name">Nombre real</label>
                         <!-- El atributo name sera la clave usada para leer el valor desde $_POST. -->
@@ -56,10 +56,9 @@ $error = $_GET['error'] ?? '';
                             type="text"
                             id="register-real-name"
                             name="nombre_real"
-                            maxlength="100"
                             autocomplete="name"
-                            required
                         >
+                        <span class="error" id="error-nombre"></span>
                     </div>
 
                     <div class="form-field" id="username">
@@ -69,49 +68,46 @@ $error = $_GET['error'] ?? '';
                             type="text"
                             id="register-username"
                             name="username"
-                            maxlength="30"
-                            pattern="[A-Za-z0-9_]+"
                             title="Utiliza solo letras, números y guion bajo."
                             autocomplete="username"
-                            required
                         >
+                        <span class="error" id="error-username"></span>
                     </div>
 
                     <!-- El tipo email comprueba el formato basico antes de enviar el formulario. -->
                     <div class="form-field" id="email">
                         <label for="register-email">Correo electrónico</label>
                         <input
-                            type="email"
+                            type="text"
                             id="register-email"
                             name="email"
-                            maxlength="254"
                             autocomplete="email"
-                            required
                         >
+                        <span class="error" id="error-email"></span>
                     </div>
 
                     <!-- type=password oculta lo escrito en pantalla, pero no cifra el dato enviado. -->
                     <div class="form-field" id="pwd">
                         <label for="register-password">Contraseña</label>
                         <input
-                            type="password"
+                            type="text"
                             id="register-password"
                             name="password"
                             autocomplete="new-password"
-                            required
                         >
+                        <span class="error" id="error-pwd"></span>
                     </div>
 
                     <!-- Esta segunda entrada permite comparar ambas contrasenas en PHP. -->
                     <div class="form-field" id="pwdconf">
                         <label for="register-password-confirmation">Repite la contraseña</label>
                         <input
-                            type="password"
+                            type="text"
                             id="register-password-confirmation"
                             name="confirmar_password"
                             autocomplete="new-password"
-                            required
                         >
+                        <span class="error" id="error-pwdconf"></span>
                     </div>
 
                     <button type="submit">Crear cuenta</button>
@@ -124,6 +120,8 @@ $error = $_GET['error'] ?? '';
     <footer class="site-footer">
         <p>ChatOnline · Mensajes para estar más cerca</p>
     </footer>
+    <script src="js/validaciones_register.js"></script>
+
     
 </body>
 </html>
