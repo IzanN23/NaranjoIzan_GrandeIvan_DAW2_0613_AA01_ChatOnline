@@ -150,7 +150,7 @@ $messageError = $_GET['error'] ?? '';
                     <p class="form-message chat-error" role="alert">Escribe un mensaje de hasta 250 caracteres.</p>
                 <?php } ?>
 
-                <form class="message-form" action="processes/message.proc.php" method="post">
+                <form id="form_message" class="message-form" action="processes/message.proc.php" method="post" novalidate>
                     <input type="hidden" name="receiver_id" value="<?php echo (int) $selectedFriend['id_users']; ?>">
                     <label class="visually-hidden" for="message-content">Escribe un mensaje</label>
                     <input
@@ -163,6 +163,8 @@ $messageError = $_GET['error'] ?? '';
                     >
                     <button type="submit">Enviar</button>
                 </form>
+
+                <p class="form-message chat-error" id="error-message" role="alert" hidden></p>
             <?php } else { ?>
                 <div class="no-conversation">
                     <span class="brand-icon" aria-hidden="true">C</span>
@@ -174,6 +176,6 @@ $messageError = $_GET['error'] ?? '';
         </section>
     </main>
 
-    
+    <script src="js/validaciones_chat.js"></script>
 </body>
 </html>

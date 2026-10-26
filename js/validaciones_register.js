@@ -1,8 +1,8 @@
-document.getElementById("register-real-name").onblur = validaNombre;
-document.getElementById("register-username").onblur = validaUsername;
-document.getElementById("register-email").onblur = validaEmail;
-document.getElementById("register-password").onkeyup = validaPassword;
-document.getElementById("register-password-confirmation").onkeyup = validaPasswordConf;
+document.getElementById("register-real-name").oninput = validaNombre;
+document.getElementById("register-username").oninput = validaUsername;
+document.getElementById("register-email").oninput = validaEmail;
+document.getElementById("register-password").oninput = validaPassword;
+document.getElementById("register-password-confirmation").oninput = validaPasswordConf;
 
 
 
