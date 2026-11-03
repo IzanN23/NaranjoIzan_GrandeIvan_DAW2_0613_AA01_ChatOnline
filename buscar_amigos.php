@@ -12,7 +12,8 @@ $username = $_SESSION['username'];
 require_once 'services/connection.php';
 
 
-$sqlRequests = 'SELECT users.id_users, users.username_users
+// Carga las solicitudes pendientes junto con la foto de quien las envio.
+$sqlRequests = 'SELECT users.id_users, users.username_users, users.profile_image_path
                 FROM tbl_friend_request AS requests
                 INNER JOIN tbl_users AS users
                   ON users.id_users = requests.id_sender
@@ -29,10 +30,12 @@ $pendingRequests = $requestsStatement->fetchAll();
 $search = trim($_GET['q'] ?? '');
 $results = array();
 
+// Busca usuarios y sus fotos para mostrarlos en los resultados.
 if ($search !== '') {
     $like = '%' . addcslashes($search, '%_\\') . '%';
 
     $sqlSearch = 'SELECT users.id_users, users.username_users, users.name_users,
+                         users.profile_image_path,
                          requests.status AS request_status,
                          requests.id_sender AS request_sender
                   FROM tbl_users AS users
@@ -64,7 +67,7 @@ $msg = $_GET['msg'] ?? '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatOnline | Buscar gente</title>
-    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body class="chat-page">
     <!-- Cabecera comun de la aplicacion. -->
@@ -75,6 +78,7 @@ $msg = $_GET['msg'] ?? '';
         </a>
         <div class="session-info">
             <span>Conectado como <strong><?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?></strong></span>
+            <a href="profile.php">Mi perfil</a>
             <a href="chat.php">Mis chats</a>
             <a href="logout.php">Cerrar sesión</a>
         </div>
@@ -93,7 +97,11 @@ $msg = $_GET['msg'] ?? '';
                 <ul class="friends-list">
                     <?php foreach ($pendingRequests as $request) { ?>
                         <li>
-                            <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($request['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
+                            <?php if (!empty($request['profile_image_path'])) { ?>
+                                <img class="friend-avatar" src="media.php?profile=<?php echo (int) $request['id_users']; ?>" alt="">
+                            <?php } else { ?>
+                                <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($request['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
+                            <?php } ?>
                             <span><?php echo htmlspecialchars($request['username_users'], ENT_QUOTES, 'UTF-8'); ?></span>
 
                             <form action="processes/respond_request.proc.php" method="post">
@@ -149,7 +157,11 @@ $msg = $_GET['msg'] ?? '';
                     <ul class="friends-list">
                         <?php foreach ($results as $person) { ?>
                             <li>
-                                <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($person['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
+                                <?php if (!empty($person['profile_image_path'])) { ?>
+                                    <img class="friend-avatar" src="media.php?profile=<?php echo (int) $person['id_users']; ?>" alt="">
+                                <?php } else { ?>
+                                    <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($person['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
+                                <?php } ?>
                                 <span>
                                     <strong><?php echo htmlspecialchars($person['username_users'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                     <?php echo htmlspecialchars($person['name_users'], ENT_QUOTES, 'UTF-8'); ?>

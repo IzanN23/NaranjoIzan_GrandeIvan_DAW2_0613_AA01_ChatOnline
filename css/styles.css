@@ -336,6 +336,10 @@ a:focus-visible {
     font-weight: 700;
 }
 
+img.friend-avatar {
+    object-fit: cover;
+}
+
 .empty-friends,
 .empty-conversation {
     color: #68776f;
@@ -413,12 +417,50 @@ a:focus-visible {
     white-space: pre-wrap;
 }
 
+.chat-image {
+    display: block;
+    max-width: min(100%, 420px);
+    max-height: 360px;
+    margin-top: 8px;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.chat-file {
+    display: inline-block;
+    margin-top: 8px;
+    color: #08784f;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
 .message-form {
     padding: 16px 20px;
     display: flex;
     gap: 10px;
     border-top: 1px solid #e0e9e3;
     background: #fff;
+}
+
+.attachment-form {
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.attachment-form input[type="file"] {
+    min-width: 0;
+    min-height: auto;
+    flex: 1 1 220px;
+    padding: 6px 0;
+    border: 0;
+    background: transparent;
+}
+
+.attachment-label {
+    align-self: center;
+    color: #52615a;
+    font-size: 0.88rem;
+    font-weight: 700;
 }
 
 .message-form input {
@@ -447,6 +489,18 @@ a:focus-visible {
 
 .chat-error {
     margin: 12px 20px 0;
+}
+
+.success-message {
+    color: #08784f;
+}
+
+.profile-preview {
+    width: 140px;
+    height: 140px;
+    margin: 0 0 20px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .no-conversation {
@@ -563,6 +617,10 @@ a:focus-visible {
 
     .message-form {
         padding: 12px;
+    }
+
+    .attachment-form input[type="file"] {
+        flex-basis: 100%;
     }
 
     .message-form button {

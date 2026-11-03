@@ -16,7 +16,7 @@ require_once 'services/connection.php';
 
 // Busca las amistades aceptadas. La consulta sirve tanto si el usuario envio
 // la solicitud como si la recibio.
-$sqlFriends = 'SELECT users.id_users, users.username_users
+$sqlFriends = 'SELECT users.id_users, users.username_users, users.profile_image_path
                FROM tbl_friend_request AS requests
                INNER JOIN tbl_users AS users
                  ON users.id_users = CASE
@@ -54,7 +54,8 @@ foreach ($friends as $friend) {
 
 if ($selectedFriend !== null) {
     // Trae mensajes enviados y recibidos entre los dos usuarios, del mas antiguo al mas nuevo.
-    $sqlMessages = 'SELECT messages.id_sender, messages.content, messages.sent_at,
+    $sqlMessages = 'SELECT messages.id_message, messages.id_sender, messages.content,
+                           messages.message_type, messages.original_file_name, messages.sent_at,
                            users.username_users AS sender_username
                     FROM tbl_messages AS messages
                     INNER JOIN tbl_users AS users
@@ -81,7 +82,7 @@ $messageError = $_GET['error'] ?? '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatOnline | Chat</title>
-    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body class="chat-page">
     <header class="site-header chat-header">
@@ -91,6 +92,7 @@ $messageError = $_GET['error'] ?? '';
         </a>
         <div class="session-info">
             <span>Conectado como <strong><?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?></strong></span>
+            <a href="profile.php">Mi perfil</a>
             <a href="buscar_amigos.php">Buscar gente</a>
             <a href="logout.php">Cerrar sesión</a>
         </div>
@@ -114,7 +116,12 @@ $messageError = $_GET['error'] ?? '';
                                 class="friend-link<?php echo $selectedFriendId === (int) $friend['id_users'] ? ' selected' : ''; ?>"
                                 href="chat.php?friend=<?php echo (int) $friend['id_users']; ?>"
                             >
-                                <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($friend['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
+                                <!-- Si no hay foto, se muestra la inicial del username. -->
+                                <?php if (!empty($friend['profile_image_path'])) { ?>
+                                    <img class="friend-avatar" src="media.php?profile=<?php echo (int) $friend['id_users']; ?>" alt="">
+                                <?php } else { ?>
+                                    <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($friend['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
+                                <?php } ?>
                                 <span><?php echo htmlspecialchars($friend['username_users'], ENT_QUOTES, 'UTF-8'); ?></span>
                             </a>
                         </li>
@@ -126,7 +133,12 @@ $messageError = $_GET['error'] ?? '';
         <section class="conversation-panel" aria-label="Conversación">
             <?php if ($selectedFriend !== null) { ?>
                 <div class="conversation-heading">
-                    <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($selectedFriend['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
+                    <!-- Muestra la foto del amigo o su inicial si todavía no tiene foto. -->
+                    <?php if (!empty($selectedFriend['profile_image_path'])) { ?>
+                        <img class="friend-avatar" src="media.php?profile=<?php echo (int) $selectedFriend['id_users']; ?>" alt="">
+                    <?php } else { ?>
+                        <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($selectedFriend['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
+                    <?php } ?>
                     <h2><?php echo htmlspecialchars($selectedFriend['username_users'], ENT_QUOTES, 'UTF-8'); ?></h2>
                 </div>
 
@@ -140,7 +152,16 @@ $messageError = $_GET['error'] ?? '';
                                     <strong><?php echo htmlspecialchars($message['sender_username'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                     <time><?php echo htmlspecialchars($message['sent_at'], ENT_QUOTES, 'UTF-8'); ?></time>
                                 </div>
-                                <p><?php echo nl2br(htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8')); ?></p>
+                                <?php if ($message['message_type'] === 'image') { ?>
+                                    <img class="chat-image" src="download.php?message=<?php echo (int) $message['id_message']; ?>" alt="Imagen enviada en el chat">
+                                <?php } elseif ($message['message_type'] === 'file') { ?>
+                                    <a class="chat-file" href="download.php?message=<?php echo (int) $message['id_message']; ?>">
+                                        Descargar: <?php echo htmlspecialchars($message['original_file_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                    </a>
+                                <?php } ?>
+                                <?php if ($message['content'] !== '') { ?>
+                                    <p><?php echo nl2br(htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8')); ?></p>
+                                <?php } ?>
                             </article>
                         <?php } ?>
                     <?php } ?>
@@ -148,6 +169,10 @@ $messageError = $_GET['error'] ?? '';
 
                 <?php if ($messageError === 'invalid') { ?>
                     <p class="form-message chat-error" role="alert">Escribe un mensaje de hasta 250 caracteres.</p>
+                <?php } elseif ($messageError === 'attachment') { ?>
+                    <p class="form-message chat-error" role="alert">Elige una imagen o un documento permitido de hasta 2 MB.</p>
+                <?php } elseif ($messageError === 'upload') { ?>
+                    <p class="form-message chat-error" role="alert">No se pudo guardar el archivo. Inténtalo de nuevo.</p>
                 <?php } ?>
 
                 <form id="form_message" class="message-form" action="processes/message.proc.php" method="post" novalidate>
@@ -162,6 +187,20 @@ $messageError = $_GET['error'] ?? '';
                         required
                     >
                     <button type="submit">Enviar</button>
+                </form>
+
+                <!-- Este formulario adjunta archivos; el de arriba solo envia texto. -->
+                <form class="message-form attachment-form" action="processes/attachment.proc.php" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="receiver_id" value="<?php echo (int) $selectedFriend['id_users']; ?>">
+                    <label class="attachment-label" for="chat-attachment">Imagen o archivo</label>
+                    <input
+                        type="file"
+                        id="chat-attachment"
+                        name="attachment"
+                        accept="image/jpeg,image/png,image/gif,image/webp,.pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                        required
+                    >
+                    <button type="submit">Adjuntar</button>
                 </form>
 
                 <p class="form-message chat-error" id="error-message" role="alert" hidden></p>
