@@ -27,6 +27,27 @@ $pendingRequests = $requestsStatement->fetchAll();
 
 
 $search = trim($_GET['q'] ?? '');
+
+// SELECT 1: todos los usuarios registrados (menos yo)
+$sqlAll = 'SELECT users.id_users, users.username_users, users.name_users,
+                  requests.status AS request_status,
+                  requests.id_sender AS request_sender
+           FROM tbl_users AS users
+           LEFT JOIN tbl_friend_request AS requests
+             ON (requests.id_sender = :me_sender
+                 AND requests.id_receiver = users.id_users)
+             OR (requests.id_sender = users.id_users
+                 AND requests.id_receiver = :me_receiver)
+           WHERE users.id_users <> :me_excluded
+           ORDER BY users.username_users';
+$allStatement = $conn->prepare($sqlAll);
+$allStatement->bindValue(':me_sender', $userId, PDO::PARAM_INT);
+$allStatement->bindValue(':me_receiver', $userId, PDO::PARAM_INT);
+$allStatement->bindValue(':me_excluded', $userId, PDO::PARAM_INT);
+$allStatement->execute();
+$allUsers = $allStatement->fetchAll();
+
+// SELECT 2: solo los usuarios que coinciden con el texto buscado.
 $results = array();
 
 if ($search !== '') {
@@ -56,16 +77,20 @@ if ($search !== '') {
     $results = $searchStatement->fetchAll();
 }
 
+$people = ($search === '') ? $allUsers : $results;
+
 $msg = $_GET['msg'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatOnline | Buscar gente</title>
     <link rel="stylesheet" href="css/styles.css?v=3">
 </head>
+
 <body class="chat-page">
     <!-- Cabecera comun de la aplicacion. -->
     <header class="site-header chat-header">
@@ -134,20 +159,21 @@ $msg = $_GET['msg'] ?? '';
                     name="q"
                     maxlength="100"
                     placeholder="Busca por nombre o username..."
-                    value="<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>"
-                >
+                    value="<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>">
                 <button type="submit">Buscar</button>
             </form>
 
             <!-- Resultados de la busqueda. -->
             <div class="messages-list" aria-live="polite">
-                <?php if ($search === '') { ?>
-                    <p class="empty-conversation">Escribe un nombre o username para empezar.</p>
-                <?php } elseif (count($results) === 0) { ?>
-                    <p class="empty-conversation">No hay nadie que coincida con «<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>».</p>
+                <?php if (count($people) === 0) { ?>
+                    <?php if ($search === '') { ?>
+                        <p class="empty-conversation">Todavía no hay más usuarios registrados.</p>
+                    <?php } else { ?>
+                        <p class="empty-conversation">No hay nadie que coincida con «<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>».</p>
+                    <?php } ?>
                 <?php } else { ?>
                     <ul class="friends-list">
-                        <?php foreach ($results as $person) { ?>
+                        <?php foreach ($people as $person) { ?>
                             <li>
                                 <span class="friend-avatar" aria-hidden="true"><?php echo htmlspecialchars(strtoupper(substr($person['username_users'], 0, 1)), ENT_QUOTES, 'UTF-8'); ?></span>
                                 <span>
@@ -156,7 +182,7 @@ $msg = $_GET['msg'] ?? '';
                                 </span>
 
                                 <?php if ($person['request_status'] === 'aceptada') { ?>
-                                    <a href="chat.php?friend=<?php echo (int) $person['id_users']; ?>">Ya sois amigos · Abrir chat</a>
+                                    <a href="chat.php?friend=<?php echo (int) $person['id_users']; ?>"> Abrir chat</a>
                                 <?php } elseif ($person['request_status'] === 'pendiente' && (int) $person['request_sender'] === $userId) { ?>
                                     <span>Solicitud enviada</span>
                                 <?php } elseif ($person['request_status'] === 'pendiente') { ?>

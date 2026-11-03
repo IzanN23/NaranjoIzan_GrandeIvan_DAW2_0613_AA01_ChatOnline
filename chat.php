@@ -71,7 +71,7 @@ if ($selectedFriend !== null) {
     $messagesStatement->bindValue(':my_receiver', $userId, PDO::PARAM_INT);
     $messagesStatement->execute();
     $messages = $messagesStatement->fetchAll();
-}
+}   
 
 $messageError = $_GET['error'] ?? '';
 ?>
@@ -157,9 +157,7 @@ $messageError = $_GET['error'] ?? '';
                         type="text"
                         id="message-content"
                         name="content"
-                        maxlength="250"
                         placeholder="Escribe un mensaje..."
-                        required
                     >
                     <button type="submit">Enviar</button>
                 </form>
@@ -176,6 +174,6 @@ $messageError = $_GET['error'] ?? '';
         </section>
     </main>
 
-    <script src="js/validaciones_chat.js"></script>
+    <script src="js/validaciones_mensajes.js"></script>
 </body>
 </html>

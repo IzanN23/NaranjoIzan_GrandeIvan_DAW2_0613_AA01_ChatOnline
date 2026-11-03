@@ -6,7 +6,8 @@ CREATE TABLE tbl_users (
   name_users VARCHAR(100) NOT NULL,
   username_users VARCHAR(50) NOT NULL UNIQUE,
   email_users VARCHAR(100) NOT NULL UNIQUE,
-  password_users VARCHAR(100) NOT NULL
+  password_users VARCHAR(100) NOT NULL,
+  foto_perfil varchar(250) NOT NULL
 );
 
 CREATE TABLE tbl_friend_request (
@@ -25,7 +26,8 @@ CREATE TABLE tbl_messages (
   id_message INT AUTO_INCREMENT PRIMARY KEY,
   id_sender INT NOT NULL,
   id_receiver INT NOT NULL,
-  content varchar(250) NOT NULL,
+  content varchar(250) NOT NULL, 
+  -- cambiar por texto imagen i archivo
   sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (id_sender)   REFERENCES tbl_users(id_users) ON DELETE CASCADE,
   FOREIGN KEY (id_receiver) REFERENCES tbl_users(id_users) ON DELETE CASCADE
