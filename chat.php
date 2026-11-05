@@ -14,8 +14,7 @@ $username = $_SESSION['username'];
 // Carga la conexion PDO para consultar amistades y mensajes.
 require_once 'services/connection.php';
 
-// Busca las amistades aceptadas. La consulta sirve tanto si el usuario envio
-// la solicitud como si la recibio.
+// Busca las amistades aceptadas y sus fotos de perfil.
 $sqlFriends = 'SELECT users.id_users, users.username_users, users.profile_image_path
                FROM tbl_friend_request AS requests
                INNER JOIN tbl_users AS users
@@ -35,7 +34,7 @@ $friendsStatement->bindValue(':status', 'aceptada');
 $friendsStatement->execute();
 $friends = $friendsStatement->fetchAll();
 
-// Si se ha elegido una amistad, mostramos su conversacion.
+// El formulario de la lista pasa el identificador de la amistad por la URL.
 $selectedFriendId = filter_input(INPUT_GET, 'friend', FILTER_VALIDATE_INT);
 if (!$selectedFriendId && count($friends) > 0) {
     $selectedFriendId = (int) $friends[0]['id_users'];
@@ -44,7 +43,7 @@ if (!$selectedFriendId && count($friends) > 0) {
 $selectedFriend = null;
 $messages = array();
 
-// Se comprueba que el id solicitado pertenece a la lista de amistades aceptadas.
+// No basta con recibir un id: se confirma que pertenece a una amistad aceptada.
 foreach ($friends as $friend) {
     if ((int) $friend['id_users'] === $selectedFriendId) {
         $selectedFriend = $friend;
@@ -53,7 +52,7 @@ foreach ($friends as $friend) {
 }
 
 if ($selectedFriend !== null) {
-    // Trae mensajes enviados y recibidos entre los dos usuarios, del mas antiguo al mas nuevo.
+    // Recupera la conversacion en ambas direcciones y el nombre de quien envio cada mensaje.
     $sqlMessages = 'SELECT messages.id_message, messages.id_sender, messages.content,
                            messages.message_type, messages.original_file_name, messages.sent_at,
                            users.username_users AS sender_username
@@ -94,6 +93,9 @@ $messageError = $_GET['error'] ?? '';
             <span>Conectado como <strong><?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?></strong></span>
             <a href="profile.php">Mi perfil</a>
             <a href="buscar_amigos.php">Buscar gente</a>
+            <?php if (!empty($_SESSION['is_admin'])) { ?>
+                <a href="Nueva_Area.php">Administrar usuarios</a>
+            <?php } ?>
             <a href="logout.php">Cerrar sesión</a>
         </div>
     </header>
@@ -116,7 +118,7 @@ $messageError = $_GET['error'] ?? '';
                                 class="friend-link<?php echo $selectedFriendId === (int) $friend['id_users'] ? ' selected' : ''; ?>"
                                 href="chat.php?friend=<?php echo (int) $friend['id_users']; ?>"
                             >
-                                <!-- Si no hay foto, se muestra la inicial del username. -->
+                                <!-- media.php busca la foto por id; si no hay, se muestra la inicial. -->
                                 <?php if (!empty($friend['profile_image_path'])) { ?>
                                     <img class="friend-avatar" src="media.php?profile=<?php echo (int) $friend['id_users']; ?>" alt="">
                                 <?php } else { ?>
@@ -133,7 +135,7 @@ $messageError = $_GET['error'] ?? '';
         <section class="conversation-panel" aria-label="Conversación">
             <?php if ($selectedFriend !== null) { ?>
                 <div class="conversation-heading">
-                    <!-- Muestra la foto del amigo o su inicial si todavía no tiene foto. -->
+                    <!-- Muestra la foto del amigo o su inicial si todavia no tiene foto. -->
                     <?php if (!empty($selectedFriend['profile_image_path'])) { ?>
                         <img class="friend-avatar" src="media.php?profile=<?php echo (int) $selectedFriend['id_users']; ?>" alt="">
                     <?php } else { ?>
@@ -152,6 +154,7 @@ $messageError = $_GET['error'] ?? '';
                                     <strong><?php echo htmlspecialchars($message['sender_username'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                     <time><?php echo htmlspecialchars($message['sent_at'], ENT_QUOTES, 'UTF-8'); ?></time>
                                 </div>
+                                <!-- La base de datos indica que elemento mostrar: imagen, descarga o texto. -->
                                 <?php if ($message['message_type'] === 'image') { ?>
                                     <img class="chat-image" src="download.php?message=<?php echo (int) $message['id_message']; ?>" alt="Imagen enviada en el chat">
                                 <?php } elseif ($message['message_type'] === 'file') { ?>
@@ -189,7 +192,7 @@ $messageError = $_GET['error'] ?? '';
                     <button type="submit">Enviar</button>
                 </form>
 
-                <!-- Este formulario adjunta archivos; el de arriba solo envia texto. -->
+                <!-- El navegador envia el archivo en $_FILES al procesador attachment.proc.php. -->
                 <form class="message-form attachment-form" action="processes/attachment.proc.php" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="receiver_id" value="<?php echo (int) $selectedFriend['id_users']; ?>">
                     <label class="attachment-label" for="chat-attachment">Imagen o archivo</label>

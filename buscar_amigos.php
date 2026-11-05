@@ -12,7 +12,7 @@ $username = $_SESSION['username'];
 require_once 'services/connection.php';
 
 
-// Carga las solicitudes pendientes junto con la foto de quien las envio.
+// Carga solicitudes pendientes e informacion de la persona que las envio.
 $sqlRequests = 'SELECT users.id_users, users.username_users, users.profile_image_path
                 FROM tbl_friend_request AS requests
                 INNER JOIN tbl_users AS users
@@ -30,7 +30,7 @@ $pendingRequests = $requestsStatement->fetchAll();
 $search = trim($_GET['q'] ?? '');
 $results = array();
 
-// Busca usuarios y sus fotos para mostrarlos en los resultados.
+// Busca hasta 20 usuarios e incluye su ruta de foto para mostrarla junto al nombre.
 if ($search !== '') {
     $like = '%' . addcslashes($search, '%_\\') . '%';
 

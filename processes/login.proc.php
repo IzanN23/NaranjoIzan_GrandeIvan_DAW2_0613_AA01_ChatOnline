@@ -31,7 +31,7 @@ require_once '../services/connection.php';
 
 // Busca solo el registro que coincide con el username.
 // La consulta preparada evita insertar el valor directamente dentro del SQL.
-$sql = 'SELECT id_users, username_users, password_users
+$sql = 'SELECT id_users, username_users, password_users, is_admin
         FROM tbl_users
         WHERE username_users = :username';
 $statement = $conn->prepare($sql);
@@ -52,6 +52,7 @@ session_regenerate_id(true);
 // Estos datos quedan disponibles en otras paginas mientras dure la sesion.
 $_SESSION['user_id'] = $user['id_users'];
 $_SESSION['username'] = $user['username_users'];
+$_SESSION['is_admin'] = (int) $user['is_admin'];
 
 // Al entrar correctamente, lleva al usuario a la pagina protegida del chat.
 header('Location: ../chat.php');

@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// La URL recibe el id del mensaje que contiene el archivo.
 $messageId = filter_input(INPUT_GET, 'message', FILTER_VALIDATE_INT);
 if (!$messageId || $messageId < 1) {
     http_response_code(404);
@@ -15,7 +16,7 @@ if (!$messageId || $messageId < 1) {
 
 require_once 'services/connection.php';
 
-// Busca el archivo y comprueba que el usuario participe en ese mensaje.
+// Busca la ruta y los datos del archivo; el usuario debe ser emisor o receptor.
 $statement = $conn->prepare(
     'SELECT file_path, original_file_name, message_type
      FROM tbl_messages
@@ -39,7 +40,7 @@ if (
     exit;
 }
 
-// Impide que la ruta de la base de datos permita salir de la carpeta de archivos.
+// Comprueba que la ruta tenga el formato generado por la aplicacion.
 if (!preg_match('/^archivos_chat\/[a-f0-9]{32}\.(jpg|jpeg|png|gif|webp|pdf|txt|doc|docx|xls|xlsx|ppt|pptx)$/', $message['file_path'])) {
     http_response_code(404);
     exit;
@@ -51,7 +52,7 @@ if (!is_file($filePath)) {
     exit;
 }
 
-// Comprueba otra vez el tipo real del archivo antes de servirlo.
+// Comprueba de nuevo el contenido real antes de enviarlo al navegador.
 $fileInfo = new finfo(FILEINFO_MIME_TYPE);
 $mimeType = $fileInfo->file($filePath);
 $tiposPermitidos = array(
@@ -79,7 +80,7 @@ if (!$tipoCorrecto) {
     exit;
 }
 
-// Las imagenes se muestran en el chat; los demas archivos se descargan.
+// El navegador muestra las imagenes en el chat y descarga los documentos.
 if ($esImagen) {
     header('Content-Type: ' . $mimeType);
     header('Content-Disposition: inline');

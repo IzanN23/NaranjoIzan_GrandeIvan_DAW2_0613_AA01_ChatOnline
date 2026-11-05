@@ -216,6 +216,90 @@ h2 {
     outline: 3px solid rgba(18, 140, 99, 0.15);
 }
 
+.admin-content {
+    width: min(1120px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 36px 0;
+    flex: 1;
+}
+
+.admin-content .intro {
+    max-width: 760px;
+}
+
+.admin-notice {
+    padding: 12px 16px;
+    border: 1px solid #cde9da;
+    border-radius: 8px;
+    background: #e8f5ee;
+    color: #08784f;
+}
+
+.admin-form {
+    margin: 0 auto 32px;
+}
+
+.admin-users {
+    padding: 24px;
+    border: 1px solid #e0e9e3;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 12px 35px rgba(31, 67, 48, 0.06);
+}
+
+.admin-users h2 {
+    margin-bottom: 18px;
+}
+
+.admin-table-wrap {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e9e3;
+    vertical-align: middle;
+}
+
+.admin-table th {
+    color: #52615a;
+    font-size: 0.85rem;
+}
+
+.admin-actions {
+    white-space: nowrap;
+}
+
+.admin-actions a {
+    margin-right: 10px;
+    color: #08784f;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.admin-actions form {
+    display: inline;
+}
+
+.admin-actions button {
+    width: auto;
+    min-height: 36px;
+    margin: 0;
+    padding: 7px 10px;
+    background: #a12b2b;
+}
+
+.admin-actions button:hover {
+    background: #821f1f;
+}
+
 button {
     width: 100%;
     min-height: 47px;

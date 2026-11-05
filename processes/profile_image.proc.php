@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Comprueba que se haya elegido una imagen y que no supere 2 MB.
+// El formulario envia la foto en $_FILES. Comprueba error, tamano y origen de la subida.
 if (
     !isset($_FILES['profile_image']['error'], $_FILES['profile_image']['size'], $_FILES['profile_image']['tmp_name']) ||
     !is_int($_FILES['profile_image']['error']) ||
@@ -26,7 +26,7 @@ if (
     exit;
 }
 
-// Comprueba el formato real de la imagen.
+// Comprueba el contenido real de la imagen, no solo el nombre o la extension.
 $fileInfo = new finfo(FILEINFO_MIME_TYPE);
 $mimeType = $fileInfo->file($_FILES['profile_image']['tmp_name']);
 $tiposPermitidos = array(
@@ -49,7 +49,7 @@ if (
     exit;
 }
 
-// Guarda la imagen en fotos_perfil con un nombre aleatorio.
+// Guarda la foto en disco con un nombre aleatorio para evitar nombres manipulados.
 $folder = __DIR__ . '/../fotos_perfil';
 if (!is_dir($folder) && !mkdir($folder, 0755)) {
     header('Location: ../profile.php?error=upload');
@@ -67,7 +67,7 @@ if (!move_uploaded_file($_FILES['profile_image']['tmp_name'], $folder . '/' . $s
 require_once __DIR__ . '/../services/connection.php';
 $userId = (int) $_SESSION['user_id'];
 
-// Guarda en la base de datos la ruta de la foto.
+// En la base de datos se guarda solo la ruta que necesitara media.php.
 $oldImageStatement = $conn->prepare(
     'SELECT profile_image_path FROM tbl_users WHERE id_users = :user_id'
 );
@@ -89,7 +89,7 @@ try {
     throw $exception;
 }
 
-// Borra la foto anterior, si tambien estaba guardada por esta aplicacion.
+// Borra la foto antigua solo si su ruta tiene el formato que genera este programa.
 if (
     is_string($oldImage) &&
     preg_match('/^fotos_perfil\/[a-f0-9]{32}\.(jpg|png|gif|webp)$/', $oldImage)

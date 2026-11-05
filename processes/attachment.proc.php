@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// El formulario envia el id del destinatario y el archivo seleccionado.
 $senderId = (int) $_SESSION['user_id'];
 $receiverId = filter_input(INPUT_POST, 'receiver_id', FILTER_VALIDATE_INT);
 
@@ -20,7 +21,8 @@ if (!$receiverId || $receiverId === $senderId) {
     exit;
 }
 
-// Comprueba que se haya elegido un archivo y que no supere 2 MB.
+// $_FILES contiene los datos que PHP recibe del formulario con multipart/form-data.
+// Comprueba que la subida haya terminado correctamente y que pese como maximo 2 MB.
 if (
     !isset($_FILES['attachment']['error'], $_FILES['attachment']['size'], $_FILES['attachment']['tmp_name'], $_FILES['attachment']['name']) ||
     !is_int($_FILES['attachment']['error']) ||
@@ -35,7 +37,7 @@ if (
     exit;
 }
 
-// Lista de extensiones y tipos de archivo permitidos.
+// Esta lista relaciona cada extension permitida con el tipo MIME esperado.
 $extension = strtolower(pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION));
 $tiposPermitidos = array(
     'jpg' => array('image/jpeg'),
@@ -53,7 +55,7 @@ $tiposPermitidos = array(
     'pptx' => array('application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/zip')
 );
 
-// Comprueba el tipo real del archivo; no se fia solamente de su extension.
+// La extension viene del nombre y podria falsificarse: finfo revisa el contenido real.
 $fileInfo = new finfo(FILEINFO_MIME_TYPE);
 $mimeType = $fileInfo->file($_FILES['attachment']['tmp_name']);
 
@@ -68,6 +70,7 @@ if (
 
 $esImagen = in_array($extension, array('jpg', 'jpeg', 'png', 'gif', 'webp'), true);
 $tipoMensaje = $esImagen ? 'image' : 'file';
+// basename quita rutas del nombre original; se limpia y limita antes de guardarlo en SQL.
 $originalName = basename($_FILES['attachment']['name']);
 $originalName = preg_replace('/[\x00-\x1F\x7F]/', '', $originalName);
 $originalName = substr($originalName, 0, 200);
@@ -91,7 +94,7 @@ if ($esImagen) {
     }
 }
 
-// El envio de archivos tambien requiere que sean amigos aceptados.
+// Solo se pueden enviar adjuntos si la amistad ya fue aceptada.
 require_once __DIR__ . '/../services/connection.php';
 $friendStatement = $conn->prepare(
     'SELECT id_request
@@ -113,7 +116,7 @@ if (!$friendStatement->fetch()) {
     exit;
 }
 
-// Guarda el archivo con un nombre aleatorio para evitar nombres peligrosos.
+// El archivo se guarda en disco con nombre aleatorio; no se usa el nombre recibido.
 $folder = __DIR__ . '/../archivos_chat';
 if (!is_dir($folder) && !mkdir($folder, 0755)) {
     header('Location: ../chat.php?friend=' . $receiverId . '&error=upload');
@@ -128,7 +131,8 @@ if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $folder . '/' . $stor
     exit;
 }
 
-// Guarda el mensaje y la ruta con una consulta preparada de PDO.
+// La base de datos guarda los datos del mensaje y la ruta, no el archivo completo.
+// Los parametros preparados de PDO separan los datos del codigo SQL.
 try {
     $messageStatement = $conn->prepare(
         'INSERT INTO tbl_messages

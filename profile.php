@@ -22,6 +22,7 @@ $profileStatement->bindValue(':user_id', $userId, PDO::PARAM_INT);
 $profileStatement->execute();
 $profileImage = $profileStatement->fetchColumn();
 
+// fetchColumn devuelve false si no existe el usuario; null significa que no tiene foto.
 if ($profileImage === false) {
     header('Location: logout.php');
     exit;
@@ -64,12 +65,13 @@ if ($profileImage === false) {
             <?php } ?>
 
             <?php if (is_string($profileImage) && $profileImage !== '') { ?>
+                <!-- media.php entrega la imagen al navegador usando el id del usuario conectado. -->
                 <img class="profile-preview" src="media.php?profile=<?php echo $userId; ?>" alt="Foto de perfil actual">
             <?php } else { ?>
                 <p class="empty-conversation">Todavía no tienes foto de perfil.</p>
             <?php } ?>
 
-            <!-- Envia la foto a PHP para validarla y guardarla. -->
+            <!-- Envia el archivo a profile_image.proc.php; enctype permite enviar archivos. -->
             <form action="processes/profile_image.proc.php" method="post" enctype="multipart/form-data">
                 <div class="form-field">
                     <label for="profile-image">Seleccionar imagen</label>
